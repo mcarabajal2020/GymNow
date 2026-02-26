@@ -11,9 +11,6 @@ class ExerciseForm
     {
         return $schema
             ->components([
-                TextInput::make('gym_id')
-                    ->required()
-                    ->numeric(),
                 TextInput::make('name')
                     ->required(),
                 TextInput::make('muscle_group'),

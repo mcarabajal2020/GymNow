@@ -17,6 +17,14 @@ class Exercise extends Model
     {
         return $this->belongsTo(Gym::class);
     }
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (auth()->check() && auth()->user()->gym_id) {
+                $model->gym_id = auth()->user()->gym_id;
+            }
+        });
+    }
 
     public function workouts()
     {

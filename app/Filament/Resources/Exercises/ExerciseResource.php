@@ -13,6 +13,9 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 class ExerciseResource extends Resource
 {
@@ -25,6 +28,14 @@ class ExerciseResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return ExerciseForm::configure($schema);
+    }
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (auth()->check() && auth()->user()->gym_id) {
+                $model->gym_id = auth()->user()->gym_id;
+            }
+        });
     }
 
     public static function table(Table $table): Table
