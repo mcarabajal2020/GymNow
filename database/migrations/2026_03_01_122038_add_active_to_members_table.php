@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('members', function (Blueprint $table) {
-           $table->foreignId('plan_id')
-            ->after('gym_id')
-            ->constrained()
-            ->cascadeOnDelete();
+            $table->boolean('active')->default(true)->after('plan_id');
         });
     }
 

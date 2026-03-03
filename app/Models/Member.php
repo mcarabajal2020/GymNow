@@ -22,10 +22,12 @@ class Member extends Model
         'status',
         'notes',
         'plan_id',
+         'active',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
+        'active' => 'boolean',
     ];
 
     protected static function booted()
@@ -60,6 +62,10 @@ class Member extends Model
         )->withPivot(['start_date', 'active'])
          ->withTimestamps();
     }
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
 
     public function exerciseLogs()
     {
@@ -68,6 +74,11 @@ class Member extends Model
     public function plan()
     {
         return $this->belongsTo(\App\Models\Plan::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
     }
 
 

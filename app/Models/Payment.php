@@ -6,37 +6,43 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    protected $fillable = [
+  protected $fillable = [
         'gym_id',
-        'member_id',
-        'plan_id',
+        'invoice_id',
         'amount',
-        'payment_method',
         'payment_date',
-        'start_date',
-        'end_date',
+        'payment_method',
         'external_payment_id',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
-        'payment_date' => 'date',
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'payment_day' => 'date',
     ];
 
-    public function gym()
+    public function invoice()
     {
-        return $this->belongsTo(Gym::class);
+        return $this->belongsTo(Invoice::class);
     }
 
-    public function member()
+   protected static function booted()
     {
-        return $this->belongsTo(Member::class);
-    }
+        static::created(function ($payment) {
 
-    public function plan()
-    {
-        return $this->belongsTo(Plan::class);
+            $invoice = $payment->invoice;
+
+            $totalPaid = $invoice->payments()->sum('amount');
+
+            if ($totalPaid >= $invoice->amount) {
+                $invoice->update([
+                    'status' => 'paid'
+                ]);
+            }
+        });
+
+        static::creating(function ($model) {
+            if (auth()->check() && auth()->user()->gym_id) {
+                $model->gym_id = auth()->user()->gym_id;
+            }
+        });
     }
 }

@@ -13,6 +13,13 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use mode\App\Models\User;
+
+
+
+
+
 
 class PaymentResource extends Resource
 {
@@ -23,9 +30,9 @@ class PaymentResource extends Resource
     protected static ?string $recordTitleAttribute = 'Payment';
 
     public static function form(Schema $schema): Schema
-    {
-        return PaymentForm::configure($schema);
-    }
+{
+    return PaymentForm::configure($schema);
+}
 
     public static function table(Table $table): Table
     {
@@ -38,6 +45,19 @@ class PaymentResource extends Resource
             //
         ];
     }
+      public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where('gym_id', auth()->user()->gym_id);
+    }
+    protected static function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['gym_id'] = auth()->user()->gym_id;
+
+        return $data;
+    }
+
+
 
     public static function getPages(): array
     {

@@ -18,20 +18,14 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->foreignId('member_id')
+            $table->foreignId('invoice_id')
                 ->constrained()
-                ->cascadeOnDelete();
-
-            $table->foreignId('plan_id')
-                ->constrained()
-                ->cascadeOnDelete();
+                ->cascadeOnDelete();    
 
             $table->decimal('amount', 10, 2);
             $table->enum('payment_method', ['cash', 'transfer', 'mp']);
             $table->date('payment_date');
 
-            $table->date('start_date');
-            $table->date('end_date');
 
             $table->string('external_payment_id')->nullable(); // futuro MercadoPago
 
