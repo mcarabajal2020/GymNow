@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->enum('payment_method', ['cash', 'transfer', 'mp']);
             $table->date('payment_date');
+            $table->enum('status', ['completed', 'void'])
+                ->default('completed');
 
 
             $table->string('external_payment_id')->nullable(); // futuro MercadoPago

@@ -2,38 +2,78 @@
 
 namespace App\Filament\Resources\Payments\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use App\Models\Invoice;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Tables;
 
 class PaymentsTable
 {
     public static function configure(Table $table): Table
-{
-    return $table
-        ->columns([
-            Tables\Columns\TextColumn::make('invoice.member.full_name')
-                ->label('Miembro')
-                ->searchable(),
+    {
+        return $table
+            ->columns([
 
-            Tables\Columns\TextColumn::make('invoice.id')
-                ->label('Factura'),
+                TextColumn::make('invoice.member.full_name')
+                    ->label('Miembro')
+                    ->searchable(),
 
-            Tables\Columns\TextColumn::make('amount')
-                ->money('ARS'),
+                TextColumn::make('invoice.id')
+                    ->label('Factura'),
 
-            Tables\Columns\TextColumn::make('payment_method')
-                ->label('Método'),
+                TextColumn::make('amount')
+                    ->money('ARS'),
 
-            Tables\Columns\TextColumn::make('payment_date')
-                ->date(),
+                TextColumn::make('payment_method')
+                    ->label('Método'),
 
-            Tables\Columns\TextColumn::make('created_at')
-                ->since(),
-        ])
-        ->defaultSort('payment_date', 'desc');
-}
+                TextColumn::make('payment_date')
+                    ->date(),
+
+                TextColumn::make('status')
+                    ->badge()
+                    ->colors([
+                        'success' => 'completed',
+                        'danger' => 'void',
+                    ]),
+
+                TextColumn::make('created_at')
+                    ->since(),
+            ])
+            ->actions([
+
+                EditAction::make()
+                    ->visible(fn ($record) => $record->status === 'completed'),
+
+                Action::make('void')
+                    ->label('Anular')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->status === 'completed')
+                    ->action(function ($record) {
+
+                        // Marcar pago como anulado
+                        $record->update([
+                            'status' => 'void',
+                        ]);
+
+                        // Recalcular estado de la factura
+                        $invoice = $record->invoice;
+
+                        $totalPaid = $invoice->payments()
+                            ->where('status', 'completed')
+                            ->sum('amount');
+
+                        if ($totalPaid >= $invoice->amount) {
+                            $invoice->update(['status' => 'paid']);
+                        } else {
+                            $invoice->update(['status' => 'pending']);
+                        }
+                    }),
+            ])
+            ->defaultSort('payment_date', 'desc');
+    }
 }
