@@ -38,6 +38,14 @@ class PaymentsTable
                         'success' => 'completed',
                         'danger' => 'void',
                     ]),
+                TextColumn::make('voidedBy.name')
+                    ->label('Anulado por')
+                    ->placeholder('-'),
+
+                TextColumn::make('voided_at')
+                    ->label('Fecha anulación')
+                    ->since()
+                    ->placeholder('-'),    
 
                 TextColumn::make('created_at')
                     ->since(),
@@ -58,6 +66,8 @@ class PaymentsTable
                         // Marcar pago como anulado
                         $record->update([
                             'status' => 'void',
+                            'voided_by' => auth()->id(),
+                            'voided_at' => now(),
                         ]);
 
                         // Recalcular estado de la factura

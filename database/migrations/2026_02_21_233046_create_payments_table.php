@@ -28,7 +28,12 @@ return new class extends Migration
             $table->enum('status', ['completed', 'void'])
                 ->default('completed');
 
+            $table->foreignId('voided_by')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
 
+            $table->timestamp('voided_at')->nullable();
             $table->string('external_payment_id')->nullable(); // futuro MercadoPago
 
             $table->timestamps();

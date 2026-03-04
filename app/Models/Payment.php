@@ -13,6 +13,8 @@ class Payment extends Model
         'payment_date',
         'payment_method',
         'status',
+        'voided_by',
+        'voided_at',
         'external_payment_id',
     ];
 
@@ -23,6 +25,11 @@ class Payment extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function voidedBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'voided_by');
     }
 
    protected static function booted()

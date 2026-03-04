@@ -45,17 +45,19 @@ class PaymentResource extends Resource
             //
         ];
     }
-      public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->where('gym_id', auth()->user()->gym_id);
-    }
+     
     protected static function mutateFormDataBeforeCreate(array $data): array
     {
         $data['gym_id'] = auth()->user()->gym_id;
 
         return $data;
     }
+    public static function getEloquentQuery(): Builder
+{
+    return parent::getEloquentQuery()
+        ->with(['invoice.member', 'voidedBy'])
+        ->where('gym_id', auth()->user()->gym_id);
+}
 
 
 
