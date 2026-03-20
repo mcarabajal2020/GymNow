@@ -24,14 +24,16 @@ class PaymentsTable
                     ->label('Factura'),
 
                 TextColumn::make('amount')
+                    ->label('Monto')
                     ->money('ARS'),
 
                 TextColumn::make('payment_method')
                     ->label('Método'),
 
                 TextColumn::make('payment_date')
+                    ->label('Fecha de pago')
                     ->date(),
-
+                    
                 TextColumn::make('status')
                     ->badge()
                     ->colors([
